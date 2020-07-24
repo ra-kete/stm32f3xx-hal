@@ -17,7 +17,8 @@ impl FlashExt for FLASH {
 }
 
 /// Constrained FLASH peripheral
-pub struct Parts {
+pub struct Parts
+ {
     /// Opaque ACR register
     pub acr: ACR,
 }
