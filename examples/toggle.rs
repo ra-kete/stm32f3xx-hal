@@ -2,7 +2,6 @@
 //! On the stm32 discovery board this is the "south" led
 //! Target board: STM32F3DISCOVERY
 
-#![deny(unsafe_code)]
 #![no_main]
 #![no_std]
 
@@ -12,14 +11,16 @@ use stm32f3xx_hal as hal;
 
 use cortex_m_rt::entry;
 use hal::pac;
+use hal::pac_gpio;
 use hal::prelude::*;
 
 #[entry]
 fn main() -> ! {
     let dp = pac::Peripherals::take().unwrap();
+    let gp = unsafe { pac_gpio::Peripherals::steal() };
 
     let mut rcc = dp.RCC.constrain();
-    let mut gpioe = dp.GPIOE.split(&mut rcc.ahb);
+    let mut gpioe = gp.GPIOE.split(&mut rcc.ahb);
 
     let mut led = gpioe
         .pe13

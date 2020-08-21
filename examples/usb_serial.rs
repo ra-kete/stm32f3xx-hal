@@ -11,6 +11,7 @@ use cortex_m::asm::delay;
 use cortex_m_rt::entry;
 
 use hal::pac;
+use hal::pac_gpio;
 use hal::prelude::*;
 use hal::usb::{Peripheral, UsbBus};
 
@@ -20,6 +21,7 @@ use usbd_serial::{SerialPort, USB_CLASS_CDC};
 #[entry]
 fn main() -> ! {
     let dp = pac::Peripherals::take().unwrap();
+    let gp = unsafe { pac_gpio::Peripherals::steal() };
 
     let mut flash = dp.FLASH.constrain();
     let mut rcc = dp.RCC.constrain();
@@ -35,13 +37,13 @@ fn main() -> ! {
     assert!(clocks.usbclk_valid());
 
     // Configure the on-board LED (LD10, south red)
-    let mut gpioe = dp.GPIOE.split(&mut rcc.ahb);
+    let mut gpioe = gp.GPIOE.split(&mut rcc.ahb);
     let mut led = gpioe
         .pe13
         .into_push_pull_output(&mut gpioe.moder, &mut gpioe.otyper);
     led.set_low().ok(); // Turn off
 
-    let mut gpioa = dp.GPIOA.split(&mut rcc.ahb);
+    let mut gpioa = gp.GPIOA.split(&mut rcc.ahb);
 
     // F3 Discovery board has a pull-up resistor on the D+ line.
     // Pull the D+ pin down to send a RESET condition to the USB bus.

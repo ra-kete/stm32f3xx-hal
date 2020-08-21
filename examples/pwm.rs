@@ -15,6 +15,7 @@ use hal::hal::PwmPin;
 use hal::flash::FlashExt;
 use hal::gpio::GpioExt;
 use hal::pac;
+use hal::pac_gpio;
 use hal::pwm::{tim16, tim2, tim3, tim8};
 use hal::rcc::RccExt;
 use hal::time::U32Ext;
@@ -23,6 +24,7 @@ use hal::time::U32Ext;
 fn main() -> ! {
     // Get our peripherals
     let dp = pac::Peripherals::take().unwrap();
+    let gp = unsafe { pac_gpio::Peripherals::steal() };
 
     // Configure our clocks
     let mut flash = dp.FLASH.constrain();
@@ -30,12 +32,12 @@ fn main() -> ! {
     let clocks = rcc.cfgr.sysclk(16.mhz()).freeze(&mut flash.acr);
 
     // Prep the pins we need in their correct alternate function
-    let mut gpioa = dp.GPIOA.split(&mut rcc.ahb);
+    let mut gpioa = gp.GPIOA.split(&mut rcc.ahb);
     let pa4 = gpioa.pa4.into_af2(&mut gpioa.moder, &mut gpioa.afrl);
     let pa6 = gpioa.pa6.into_af2(&mut gpioa.moder, &mut gpioa.afrl);
     let pa7 = gpioa.pa7.into_af2(&mut gpioa.moder, &mut gpioa.afrl);
 
-    let mut gpiob = dp.GPIOB.split(&mut rcc.ahb);
+    let mut gpiob = gp.GPIOB.split(&mut rcc.ahb);
     let pb0 = gpiob.pb0.into_af2(&mut gpiob.moder, &mut gpiob.afrl);
     let pb1 = gpiob.pb1.into_af2(&mut gpiob.moder, &mut gpiob.afrl);
     let pb4 = gpiob.pb4.into_af2(&mut gpiob.moder, &mut gpiob.afrl);
@@ -43,7 +45,7 @@ fn main() -> ! {
     let pb8 = gpiob.pb8.into_af1(&mut gpiob.moder, &mut gpiob.afrh);
     let pb10 = gpiob.pb10.into_af1(&mut gpiob.moder, &mut gpiob.afrh);
 
-    let mut gpioc = dp.GPIOC.split(&mut rcc.ahb);
+    let mut gpioc = gp.GPIOC.split(&mut rcc.ahb);
     let pc10 = gpioc.pc10.into_af4(&mut gpioc.moder, &mut gpioc.afrh);
 
     // TIM3

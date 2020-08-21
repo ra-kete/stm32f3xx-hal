@@ -8,13 +8,15 @@ extern crate panic_semihosting;
 use cortex_m_rt::entry;
 use cortex_m_semihosting::hprintln;
 
-use stm32f3xx_hal::{adc, pac, prelude::*};
+use stm32f3xx_hal::{adc, pac, pac_gpio, prelude::*};
 
 #[entry]
 /// Main Thread
 fn main() -> ! {
     // Get peripherals, clocks and freeze them
     let mut dp = pac::Peripherals::take().unwrap();
+    let gp = unsafe { pac_gpio::Peripherals::steal() };
+
     let mut rcc = dp.RCC.constrain();
     let clocks = rcc.cfgr.freeze(&mut dp.FLASH.constrain().acr);
 
@@ -31,7 +33,7 @@ fn main() -> ! {
 
     // Set up pin PA0 as analog pin.
     // This pin is connected to the user button on the stm32f3discovery board.
-    let mut gpio_a = dp.GPIOA.split(&mut rcc.ahb);
+    let mut gpio_a = gp.GPIOA.split(&mut rcc.ahb);
     let mut adc1_in1_pin = gpio_a.pa0.into_analog(&mut gpio_a.moder, &mut gpio_a.pupdr);
 
     // Be aware that the values in the table below depend on the input of VREF.

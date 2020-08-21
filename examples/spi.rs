@@ -10,16 +10,18 @@ use stm32f3xx_hal as hal;
 use cortex_m_rt::entry;
 
 use hal::pac;
+use hal::pac_gpio;
 use hal::prelude::*;
 use hal::spi::{Mode, Phase, Polarity, Spi};
 
 #[entry]
 fn main() -> ! {
     let dp = pac::Peripherals::take().unwrap();
+    let gp = unsafe { pac_gpio::Peripherals::steal() };
 
     let mut flash = dp.FLASH.constrain();
     let mut rcc = dp.RCC.constrain();
-    let mut gpioa = dp.GPIOA.split(&mut rcc.ahb);
+    let mut gpioa = gp.GPIOA.split(&mut rcc.ahb);
 
     let clocks = rcc
         .cfgr

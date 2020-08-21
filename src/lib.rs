@@ -106,6 +106,21 @@ pub use stm32f3::stm32f3x8 as pac;
 #[deprecated(since = "0.5.0", note = "please use `pac` instead")]
 pub use crate::pac as stm32;
 
+#[cfg(feature = "gpio-f302")]
+pub use stm32f3_gpio::f302 as pac_gpio;
+
+#[cfg(feature = "gpio-f303")]
+pub use stm32f3_gpio::f303 as pac_gpio;
+
+#[cfg(feature = "gpio-f303e")]
+pub use stm32f3_gpio::f303e as pac_gpio;
+
+#[cfg(feature = "gpio-f333")]
+pub use stm32f3_gpio::f333 as pac_gpio;
+
+#[cfg(feature = "gpio-f373")]
+pub use stm32f3_gpio::f373 as pac_gpio;
+
 // Enable use of interrupt macro
 #[cfg(feature = "rt")]
 pub use crate::pac::interrupt;

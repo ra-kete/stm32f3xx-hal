@@ -36,6 +36,9 @@ default-features = false
 version = "1"
 default-features = false
 
+[dependencies.stm32f3-gpio]
+git = "https://github.com/ra-kete/stm32f3-gpio.git"
+
 [dependencies.stm32-usbd]
 version = "0.5"
 optional = true
@@ -57,11 +60,11 @@ device-selected = []
 direct-call-deprecated = []
 rt = ["stm32f3/rt"]
 
-gpio-f302 = []
-gpio-f303 = []
-gpio-f303e = []
-gpio-f333 = []
-gpio-f373 = []
+gpio-f302 = ["stm32f3-gpio/f302"]
+gpio-f303 = ["stm32f3-gpio/f303"]
+gpio-f303e = ["stm32f3-gpio/f303e"]
+gpio-f333 = ["stm32f3-gpio/f333"]
+gpio-f373 = ["stm32f3-gpio/f373"]
 
 # Any Changes here should be mirrored in README.md, src/lib.rs, and
 # .github/workflows/ci.yml.

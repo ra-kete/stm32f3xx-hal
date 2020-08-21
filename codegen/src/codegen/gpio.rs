@@ -22,7 +22,7 @@ fn gen_gpio_ip(ip: &gpio::Ip) -> Result<()> {
     let ports = merge_pins_by_port(&ip.pins)?;
 
     println!(r#"#[cfg(feature = "{}")]"#, feature);
-    gen_gpio_macro_call(&ports, &feature)?;
+    gen_gpio_macro_call(&ports)?;
     Ok(())
 }
 
@@ -59,25 +59,18 @@ fn merge_pins_by_port(pins: &[gpio::Pin]) -> Result<Vec<Port>> {
     Ok(ports)
 }
 
-fn gen_gpio_macro_call(ports: &[Port], feature: &str) -> Result<()> {
+fn gen_gpio_macro_call(ports: &[Port]) -> Result<()> {
     println!("gpio!([");
     for port in ports {
-        gen_port(port, feature)?;
+        gen_port(port)?;
     }
     println!("]);");
     Ok(())
 }
 
-fn gen_port(port: &Port, feature: &str) -> Result<()> {
-    let pac_module = get_port_pac_module(port, feature);
-
+fn gen_port(port: &Port) -> Result<()> {
     println!("    {{");
-    println!(
-        "        port: ({}/{}, pac: {}),",
-        port.id,
-        port.id.to_lowercase(),
-        pac_module,
-    );
+    println!("        port: {}/{},", port.id, port.id.to_lowercase(),);
     println!("        pins: [");
 
     for pin in port.pins.iter() {
@@ -89,17 +82,6 @@ fn gen_port(port: &Port, feature: &str) -> Result<()> {
     Ok(())
 }
 
-fn get_port_pac_module(port: &Port, feature: &str) -> &'static str {
-    // The registers in ports A and B have different reset values due to the
-    // presence of debug pins, so they get dedicated PAC modules.
-    match port.id {
-        'A' => "gpioa",
-        'B' => "gpiob",
-        'D' if feature == "gpio-f373" => "gpiod",
-        _ => "gpioc",
-    }
-}
-
 fn gen_pin(pin: &gpio::Pin) -> Result<()> {
     let nr = pin.number()?;
     let reset_mode = get_pin_reset_mode(pin)?;
@@ -107,12 +89,8 @@ fn gen_pin(pin: &gpio::Pin) -> Result<()> {
     let af_numbers = get_pin_af_numbers(pin)?;
 
     println!(
-        "            {} => {{ reset: {}, afr: {}/{}, af: {:?} }},",
-        nr,
-        reset_mode,
-        afr,
-        afr.to_lowercase(),
-        af_numbers,
+        "            {} => {{ reset: {}, afr: {}, af: {:?} }},",
+        nr, reset_mode, afr, af_numbers,
     );
 
     Ok(())

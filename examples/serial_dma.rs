@@ -9,17 +9,18 @@ use panic_semihosting as _;
 
 use cortex_m::singleton;
 use cortex_m_rt::entry;
-use stm32f3xx_hal::{pac, prelude::*, serial::Serial};
+use stm32f3xx_hal::{pac, pac_gpio, prelude::*, serial::Serial};
 
 #[entry]
 fn main() -> ! {
     let dp = pac::Peripherals::take().unwrap();
+    let gp = unsafe { pac_gpio::Peripherals::steal() };
 
     let mut flash = dp.FLASH.constrain();
     let mut rcc = dp.RCC.constrain();
     let clocks = rcc.cfgr.freeze(&mut flash.acr);
 
-    let mut gpioa = dp.GPIOA.split(&mut rcc.ahb);
+    let mut gpioa = gp.GPIOA.split(&mut rcc.ahb);
 
     let pins = (
         gpioa.pa9.into_af7(&mut gpioa.moder, &mut gpioa.afrh),
